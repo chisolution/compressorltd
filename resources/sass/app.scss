@@ -1,0 +1,45 @@
+// Import Sass modules
+@use "sass:color";
+
+// Import Tailwind
+@import "../css/app.css";
+
+// Variables
+$primary-color: #33c4aa;
+$secondary-color: #41b4d1;
+$text-color: #333;
+$light-color: #fff;
+$dark-color: #222;
+
+// Custom styles
+body {
+    font-family: 'Poppins', sans-serif;
+    color: $text-color;
+    line-height: 1.6;
+}
+
+.btn-primary {
+    background-color: $primary-color;
+    color: $light-color;
+    padding: 0.75rem 1.5rem;
+    border-radius: 0.25rem;
+    font-weight: 600;
+    transition: all 0.3s ease;
+
+    &:hover {
+        background-color: color.adjust($primary-color, $lightness: -10%);
+    }
+}
+
+.btn-secondary {
+    background-color: $secondary-color;
+    color: $light-color;
+    padding: 0.75rem 1.5rem;
+    border-radius: 0.25rem;
+    font-weight: 600;
+    transition: all 0.3s ease;
+
+    &:hover {
+        background-color: color.adjust($secondary-color, $lightness: -10%);
+    }
+}

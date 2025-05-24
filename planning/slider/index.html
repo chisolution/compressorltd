@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Swiper Progress Bar</title>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/swiper@9/swiper-bundle.min.css" />
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" />
+  <style>
+    body, html {
+        margin: 0;
+        padding: 0;
+        height: 100%;
+        overflow: hidden;
+    }
+    
+    .swiper-container {
+        width: 100vw;
+        height: 100vh;
+    }
+    
+    .swiper-wrapper {
+        width: 100%;
+        height: 100% !important;
+        padding-bottom: 64px !important;
+        -webkit-transition-timing-function: ease-in-out !important;
+        transition-timing-function: ease-in-out !important;
+        position: relative;
+    }
+    
+    .swiper-slide {
+        height: 100vh;
+    }
+    
+    .slide-content {
+        position: relative;
+        width: 100%;
+        height: 100%;
+    }
+    
+    .slide-overlay {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background-color: rgba(0, 0, 0, 0.5);
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+        color: white;
+        text-align: center;
+    }
+    
+    .swiper-pagination-progressbar .swiper-pagination-progressbar-fill {
+        background: #4F46E5 !important;
+    }
+  </style>
+</head>
+<body>
+
+
+    <!--HTML CODE-->
+    <div class="w-full relative">
+    <div class="swiper progress-slide-carousel swiper-container">
+    <div class="swiper-wrapper">
+    <div class="swiper-slide">
+    <div class="slide-content">
+        <img src="hero/slide1.jpg" alt="Hero Image 1" class="w-full h-full object-cover">
+        <div class="slide-overlay">
+            <h2 class="text-4xl font-bold mb-4">Welcome to Our Site</h2>
+            <p class="text-xl">Discover amazing content and features</p>
+        </div>
+    </div>
+    </div>
+    <div class="swiper-slide">
+    <div class="slide-content">
+        <img src="hero/slide2.jpg" alt="Hero Image 2" class="w-full h-full object-cover">
+        <div class="slide-overlay">
+            <h2 class="text-4xl font-bold mb-4">Explore Our Services</h2>
+            <p class="text-xl">Professional solutions for your needs</p>
+        </div>
+    </div>
+    </div>
+    <div class="swiper-slide">
+    <div class="slide-content">
+        <img src="hero/slide3.jpg" alt="Hero Image 3" class="w-full h-full object-cover">
+        <div class="slide-overlay">
+            <h2 class="text-4xl font-bold mb-4">Join Our Community</h2>
+            <p class="text-xl">Connect with like-minded individuals</p>
+        </div>
+    </div>
+    </div>
+    </div>
+    <div class="swiper-pagination !bottom-8 !top-auto !w-80 right-0 left-0 mx-auto bg-gray-100"></div>
+    </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/swiper@9/swiper-bundle.min.js"></script>
+    <script>
+        
+        var swiper = new Swiper(".progress-slide-carousel", {
+            loop: true,
+            fraction: true,
+            speed: 1500, // Slower transition speed (1.5 seconds)
+            effect: "fade", // Fade transition effect
+            fadeEffect: {
+                crossFade: true
+            },
+            autoplay: {
+                delay: 5000, // 5 seconds between slides
+                disableOnInteraction: false,
+            },
+            pagination: {
+                el: ".progress-slide-carousel .swiper-pagination",
+                type: "progressbar",
+            },
+        });
+
+    </script>
+</body>
+</html>
+
