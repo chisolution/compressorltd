@@ -34,7 +34,6 @@ class Product extends Model
         'discount_amount' => 'decimal:2',
         'is_on_sale' => 'boolean',
         'featured' => 'boolean',
-        'specifications' => 'array',
     ];
 
     public function category()
@@ -190,7 +189,29 @@ class Product extends Model
         if (is_string($this->specifications)) {
             $decoded = json_decode($this->specifications, true);
             if (json_last_error() === JSON_ERROR_NONE && is_array($decoded)) {
-                return $this->getFormattedSpecificationsAttribute(); // Recursive call with decoded data
+                // Format the decoded JSON as a table
+                $html = '<div class="specifications-table">';
+                $html .= '<table class="w-full border-collapse border border-gray-300">';
+                $html .= '<thead>';
+                $html .= '<tr class="bg-gray-100">';
+                $html .= '<th class="border border-gray-300 px-4 py-2 text-left font-semibold">Specification</th>';
+                $html .= '<th class="border border-gray-300 px-4 py-2 text-left font-semibold">Value</th>';
+                $html .= '</tr>';
+                $html .= '</thead>';
+                $html .= '<tbody>';
+
+                foreach ($decoded as $key => $value) {
+                    $html .= '<tr>';
+                    $html .= '<td class="border border-gray-300 px-4 py-2 font-medium">' . htmlspecialchars($key) . '</td>';
+                    $html .= '<td class="border border-gray-300 px-4 py-2">' . htmlspecialchars($value) . '</td>';
+                    $html .= '</tr>';
+                }
+
+                $html .= '</tbody>';
+                $html .= '</table>';
+                $html .= '</div>';
+
+                return $html;
             }
 
             // If not JSON, return as plain text

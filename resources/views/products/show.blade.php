@@ -152,7 +152,31 @@
 
                     @if($product->specifications)
                         <div x-show="activeTab === 'specifications'" class="prose max-w-none">
-                            {!! $product->specifications !!}
+                            <style>
+                                .specifications-table table {
+                                    border-collapse: collapse;
+                                    width: 100%;
+                                    margin: 0;
+                                }
+                                .specifications-table th,
+                                .specifications-table td {
+                                    border: 1px solid #d1d5db;
+                                    padding: 12px 16px;
+                                    text-align: left;
+                                }
+                                .specifications-table th {
+                                    background-color: #f9fafb;
+                                    font-weight: 600;
+                                    color: #374151;
+                                }
+                                .specifications-table tr:nth-child(even) {
+                                    background-color: #f9fafb;
+                                }
+                                .specifications-table tr:hover {
+                                    background-color: #f3f4f6;
+                                }
+                            </style>
+                            {!! $product->formatted_specifications !!}
                         </div>
                     @endif
 
