@@ -57,4 +57,30 @@ class Category extends Model
 
         return $descendants;
     }
+
+    /**
+     * Get the total count of active products in this category and all its subcategories
+     */
+    public function getTotalProductsCount()
+    {
+        // Count direct products in this category
+        $count = $this->products()->where('status', 'active')->count();
+
+        // Add products from all subcategories recursively
+        foreach ($this->children as $child) {
+            $count += $child->getTotalProductsCount();
+        }
+
+        return $count;
+    }
+
+    /**
+     * Scope to include product counts for categories
+     */
+    public function scopeWithProductCounts($query)
+    {
+        return $query->with(['children', 'products' => function($query) {
+            $query->where('status', 'active');
+        }]);
+    }
 }

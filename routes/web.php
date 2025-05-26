@@ -42,6 +42,9 @@ Route::get('/api/branches/{branch}', [App\Http\Controllers\ContactController::cl
 Route::get('/blog', [App\Http\Controllers\BlogController::class, 'index'])->name('blog.index');
 Route::get('/blog/{slug}', [App\Http\Controllers\BlogController::class, 'show'])->name('blog.show');
 
+// Comment routes
+Route::post('/blog/{slug}/comments', [App\Http\Controllers\CommentController::class, 'store'])->name('blog.comments.store');
+
 // Newsletter routes
 Route::post('/newsletter/subscribe', [App\Http\Controllers\NewsletterController::class, 'store'])->name('newsletters.store');
 Route::get('/newsletter/unsubscribe/{token}', [App\Http\Controllers\NewsletterController::class, 'unsubscribe'])->name('newsletters.unsubscribe');
@@ -95,6 +98,11 @@ Route::prefix('admin')->name('admin.')->middleware(['auth'])->group(function () 
 
     // Blogs
     Route::resource('blogs', BlogController::class);
+
+    // Comments
+    Route::resource('comments', App\Http\Controllers\Admin\CommentController::class);
+    Route::post('comments/{comment}/approve', [App\Http\Controllers\Admin\CommentController::class, 'approve'])->name('comments.approve');
+    Route::post('comments/{comment}/reject', [App\Http\Controllers\Admin\CommentController::class, 'reject'])->name('comments.reject');
 
     // Sliders
     Route::resource('sliders', SliderController::class);

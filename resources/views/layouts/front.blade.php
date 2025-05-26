@@ -880,15 +880,24 @@
                         showMessage(messageDiv, data.message, 'success');
                         emailInput.classList.add('border-green-500');
                         emailInput.value = ''; // Clear the form
+
+                        // Show success alert
+                        alert('✅ Success!\n\n' + data.message);
                     } else {
                         showMessage(messageDiv, data.message || 'An error occurred. Please try again.', 'error');
                         emailInput.classList.add('border-red-500');
+
+                        // Show error alert
+                        alert('❌ Error!\n\n' + (data.message || 'An error occurred. Please try again.'));
                     }
                 })
                 .catch(error => {
                     console.error('Newsletter subscription error:', error);
                     showMessage(messageDiv, 'An error occurred. Please try again.', 'error');
                     emailInput.classList.add('border-red-500');
+
+                    // Show error alert
+                    alert('❌ Error!\n\nAn error occurred while subscribing to the newsletter. Please try again.');
                 })
                 .finally(() => {
                     // Restore button state
@@ -1043,12 +1052,16 @@
                         form.reset(); // Clear the form
                         clearGlobalQuoteFormErrors(form);
 
-                        // Auto-close modal after 3 seconds
-                        setTimeout(() => {
-                            closeQuoteModal();
-                        }, 3000);
+                        // Show success alert
+                        alert('✅ Success!\n\n' + data.message);
+
+                        // Auto-close modal after alert
+                        closeQuoteModal();
                     } else {
                         showGlobalQuoteMessage(messageDiv, data.message || 'An error occurred. Please try again.', 'error');
+
+                        // Show error alert
+                        alert('❌ Error!\n\n' + (data.message || 'An error occurred. Please try again.'));
                     }
                 })
                 .catch(error => {
@@ -1063,8 +1076,14 @@
                             }
                         });
                         showGlobalQuoteMessage(messageDiv, 'Please correct the errors below.', 'error');
+
+                        // Show validation error alert
+                        alert('❌ Validation Error!\n\nPlease correct the errors in the form and try again.');
                     } else {
                         showGlobalQuoteMessage(messageDiv, error.message || 'An error occurred. Please try again.', 'error');
+
+                        // Show general error alert
+                        alert('❌ Error!\n\n' + (error.message || 'An error occurred. Please try again.'));
                     }
                 })
                 .finally(() => {

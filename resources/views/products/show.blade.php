@@ -398,12 +398,16 @@
                 form.reset(); // Clear the form
                 clearQuoteFormErrors(form);
 
-                // Auto-close modal after 3 seconds
-                setTimeout(() => {
-                    closeProductQuoteModal();
-                }, 3000);
+                // Show success alert
+                alert('✅ Success!\n\n' + data.message);
+
+                // Auto-close modal after alert
+                closeProductQuoteModal();
             } else {
                 showQuoteMessage(messageDiv, data.message || 'An error occurred. Please try again.', 'error');
+
+                // Show error alert
+                alert('❌ Error!\n\n' + (data.message || 'An error occurred. Please try again.'));
             }
         })
         .catch(error => {
@@ -418,8 +422,14 @@
                     }
                 });
                 showQuoteMessage(messageDiv, 'Please correct the errors below.', 'error');
+
+                // Show validation error alert
+                alert('❌ Validation Error!\n\nPlease correct the errors in the form and try again.');
             } else {
                 showQuoteMessage(messageDiv, error.message || 'An error occurred. Please try again.', 'error');
+
+                // Show general error alert
+                alert('❌ Error!\n\n' + (error.message || 'An error occurred. Please try again.'));
             }
         })
         .finally(() => {

@@ -142,6 +142,19 @@
                         </a>
                     </li>
                     <li class="mb-1">
+                        <a href="{{ route('admin.comments.index') }}" class="block py-2 px-4 hover:bg-gray-700 {{ request()->routeIs('admin.comments.*') ? 'bg-gray-700' : '' }}">
+                            <i class="fas fa-comment-dots mr-2"></i> Comments
+                            @php
+                                $pendingComments = \App\Models\Comment::where('status', 'pending')->count();
+                            @endphp
+                            @if($pendingComments > 0)
+                                <span class="inline-flex items-center justify-center px-2 py-1 text-xs font-bold leading-none text-white bg-red-600 rounded-full ml-2">
+                                    {{ $pendingComments }}
+                                </span>
+                            @endif
+                        </a>
+                    </li>
+                    <li class="mb-1">
                         <a href="{{ route('admin.sliders.index') }}" class="block py-2 px-4 hover:bg-gray-700 {{ request()->routeIs('admin.sliders.*') ? 'bg-gray-700' : '' }}">
                             <i class="fas fa-images mr-2"></i> Sliders
                         </a>

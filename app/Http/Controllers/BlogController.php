@@ -22,7 +22,7 @@ class BlogController extends Controller
             $category = BlogCategory::where('slug', $request->category)
                 ->where('active', true)
                 ->first();
-            
+
             if ($category) {
                 $query->where('blog_category_id', $category->id);
             }
@@ -60,8 +60,8 @@ class BlogController extends Controller
 
         // SEO Meta Data
         $seoData = [
-            'title' => $request->has('category') && isset($category) 
-                ? $category->name . ' - Blog' 
+            'title' => $request->has('category') && isset($category)
+                ? $category->name . ' - Blog'
                 : 'Blog',
             'description' => $request->has('category') && isset($category)
                 ? "Read our latest articles about {$category->name}. Stay updated with industry insights, tips, and expert advice."
@@ -74,10 +74,10 @@ class BlogController extends Controller
         ];
 
         return view('blog.index', compact(
-            'blogs', 
-            'categories', 
-            'featuredPosts', 
-            'recentPosts', 
+            'blogs',
+            'categories',
+            'featuredPosts',
+            'recentPosts',
             'seoData'
         ));
     }
@@ -87,7 +87,9 @@ class BlogController extends Controller
      */
     public function show($slug)
     {
-        $blog = Blog::with('category')
+        $blog = Blog::with(['category', 'approvedComments' => function($query) {
+                $query->orderBy('created_at', 'desc');
+            }])
             ->where('slug', $slug)
             ->published()
             ->firstOrFail();
@@ -142,11 +144,11 @@ class BlogController extends Controller
         ];
 
         return view('blog.show', compact(
-            'blog', 
-            'relatedPosts', 
-            'previousPost', 
-            'nextPost', 
-            'recentPosts', 
+            'blog',
+            'relatedPosts',
+            'previousPost',
+            'nextPost',
+            'recentPosts',
             'categories',
             'seoData'
         ));

@@ -438,6 +438,114 @@
                             </div>
                         </div>
                     @endif
+
+                    <!-- Comments Section -->
+                    <div class="mt-8">
+                        <div class="bg-white rounded-lg shadow-md p-8">
+                            <h2 class="text-2xl font-bold text-gray-800 mb-6">
+                                <i class="fas fa-comments text-primary-color mr-2"></i>
+                                Comments ({{ $blog->approvedComments->count() }})
+                            </h2>
+
+                            <!-- Comments List -->
+                            @if($blog->approvedComments->count() > 0)
+                                <div class="space-y-6 mb-8">
+                                    @foreach($blog->approvedComments as $comment)
+                                        <div class="border-b border-gray-200 pb-6 last:border-b-0 last:pb-0">
+                                            <div class="flex items-start space-x-4">
+                                                <div class="flex-shrink-0">
+                                                    <div class="w-12 h-12 bg-primary-color rounded-full flex items-center justify-center">
+                                                        <span class="text-white font-bold text-lg">
+                                                            {{ strtoupper(substr($comment->name, 0, 1)) }}
+                                                        </span>
+                                                    </div>
+                                                </div>
+                                                <div class="flex-1 min-w-0">
+                                                    <div class="flex items-center justify-between mb-2">
+                                                        <h4 class="text-lg font-semibold text-gray-800">{{ $comment->name }}</h4>
+                                                        <time class="text-sm text-gray-500" datetime="{{ $comment->created_at->toISOString() }}">
+                                                            {{ $comment->created_at->format('M j, Y \a\t g:i A') }}
+                                                        </time>
+                                                    </div>
+                                                    <p class="text-gray-700 leading-relaxed">{{ $comment->comment }}</p>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    @endforeach
+                                </div>
+                            @else
+                                <div class="text-center py-8 mb-8">
+                                    <div class="w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                                        <i class="fas fa-comments text-gray-400 text-2xl"></i>
+                                    </div>
+                                    <h3 class="text-lg font-semibold text-gray-600 mb-2">No comments yet</h3>
+                                    <p class="text-gray-500">Be the first to share your thoughts on this article!</p>
+                                </div>
+                            @endif
+
+                            <!-- Comment Form -->
+                            <div class="border-t border-gray-200 pt-8">
+                                <h3 class="text-xl font-bold text-gray-800 mb-6">Leave a Comment</h3>
+
+                                <form id="comment-form" action="{{ route('blog.comments.store', $blog->slug) }}" method="POST" class="space-y-6">
+                                    @csrf
+
+                                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                        <div>
+                                            <label for="name" class="block text-sm font-medium text-gray-700 mb-2">
+                                                Name <span class="text-red-500">*</span>
+                                            </label>
+                                            <input type="text" id="name" name="name" required
+                                                   class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-color focus:border-primary-color transition-colors"
+                                                   placeholder="Your full name">
+                                            <div class="error-message text-red-500 text-sm mt-1 hidden"></div>
+                                        </div>
+
+                                        <div>
+                                            <label for="email" class="block text-sm font-medium text-gray-700 mb-2">
+                                                Email <span class="text-red-500">*</span>
+                                            </label>
+                                            <input type="email" id="email" name="email" required
+                                                   class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-color focus:border-primary-color transition-colors"
+                                                   placeholder="your@email.com">
+                                            <div class="error-message text-red-500 text-sm mt-1 hidden"></div>
+                                        </div>
+                                    </div>
+
+                                    <div>
+                                        <label for="comment" class="block text-sm font-medium text-gray-700 mb-2">
+                                            Comment <span class="text-red-500">*</span>
+                                        </label>
+                                        <textarea id="comment" name="comment" rows="5" required
+                                                  class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-color focus:border-primary-color transition-colors resize-vertical"
+                                                  placeholder="Share your thoughts about this article..."></textarea>
+                                        <div class="error-message text-red-500 text-sm mt-1 hidden"></div>
+                                    </div>
+
+                                    <div class="bg-blue-50 border border-blue-200 rounded-lg p-4">
+                                        <div class="flex items-start">
+                                            <i class="fas fa-info-circle text-blue-500 mt-1 mr-3"></i>
+                                            <div class="text-sm text-blue-700">
+                                                <p class="font-medium mb-1">Comment Moderation</p>
+                                                <p>Your comment will be reviewed by our team before being published. Please keep it respectful and relevant to the article.</p>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <div class="flex items-center justify-between">
+                                        <div class="text-sm text-gray-500">
+                                            <span class="text-red-500">*</span> Required fields
+                                        </div>
+                                        <button type="submit"
+                                                class="bg-primary-color hover:bg-secondary-color text-white px-8 py-3 rounded-lg font-medium transition-all duration-200 transform hover:scale-105 focus:outline-none focus:ring-2 focus:ring-primary-color focus:ring-offset-2">
+                                            <i class="fas fa-paper-plane mr-2"></i>
+                                            Submit Comment
+                                        </button>
+                                    </div>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
                 </div>
 
                 <!-- Sidebar -->
@@ -560,5 +668,111 @@
             console.error('Could not copy text: ', err);
         });
     }
+
+    // Comment form submission
+    document.addEventListener('DOMContentLoaded', function() {
+        const commentForm = document.getElementById('comment-form');
+
+        if (commentForm) {
+            commentForm.addEventListener('submit', function(e) {
+                e.preventDefault();
+
+                // Clear previous errors
+                document.querySelectorAll('.error-message').forEach(el => {
+                    el.classList.add('hidden');
+                    el.textContent = '';
+                });
+
+                // Get form data
+                const formData = new FormData(this);
+                const submitButton = this.querySelector('button[type="submit"]');
+                const originalButtonText = submitButton.innerHTML;
+
+                // Show loading state
+                submitButton.disabled = true;
+                submitButton.innerHTML = '<i class="fas fa-spinner fa-spin mr-2"></i>Submitting...';
+
+                // Submit form
+                fetch(this.action, {
+                    method: 'POST',
+                    body: formData,
+                    headers: {
+                        'X-Requested-With': 'XMLHttpRequest',
+                        'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
+                    }
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        // Show success message
+                        const successDiv = document.createElement('div');
+                        successDiv.className = 'bg-green-50 border border-green-200 rounded-lg p-4 mb-6';
+                        successDiv.innerHTML = `
+                            <div class="flex items-start">
+                                <i class="fas fa-check-circle text-green-500 mt-1 mr-3"></i>
+                                <div class="text-sm text-green-700">
+                                    <p class="font-medium mb-1">Comment Submitted Successfully!</p>
+                                    <p>${data.message}</p>
+                                </div>
+                            </div>
+                        `;
+
+                        // Insert success message before the form
+                        commentForm.parentNode.insertBefore(successDiv, commentForm);
+
+                        // Reset form
+                        commentForm.reset();
+
+                        // Scroll to success message
+                        successDiv.scrollIntoView({ behavior: 'smooth', block: 'center' });
+
+                        // Remove success message after 10 seconds
+                        setTimeout(() => {
+                            successDiv.remove();
+                        }, 10000);
+                    } else {
+                        // Show validation errors
+                        if (data.errors) {
+                            Object.keys(data.errors).forEach(field => {
+                                const input = document.querySelector(`[name="${field}"]`);
+                                if (input) {
+                                    const errorDiv = input.parentNode.querySelector('.error-message');
+                                    if (errorDiv) {
+                                        errorDiv.textContent = data.errors[field][0];
+                                        errorDiv.classList.remove('hidden');
+                                    }
+                                }
+                            });
+                        }
+                    }
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    // Show generic error message
+                    const errorDiv = document.createElement('div');
+                    errorDiv.className = 'bg-red-50 border border-red-200 rounded-lg p-4 mb-6';
+                    errorDiv.innerHTML = `
+                        <div class="flex items-start">
+                            <i class="fas fa-exclamation-circle text-red-500 mt-1 mr-3"></i>
+                            <div class="text-sm text-red-700">
+                                <p class="font-medium mb-1">Error</p>
+                                <p>Something went wrong. Please try again later.</p>
+                            </div>
+                        </div>
+                    `;
+                    commentForm.parentNode.insertBefore(errorDiv, commentForm);
+
+                    setTimeout(() => {
+                        errorDiv.remove();
+                    }, 5000);
+                })
+                .finally(() => {
+                    // Reset button state
+                    submitButton.disabled = false;
+                    submitButton.innerHTML = originalButtonText;
+                });
+            });
+        }
+    });
 </script>
 @endpush

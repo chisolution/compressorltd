@@ -151,6 +151,20 @@
                                 <a href="{{ route('products.show', $product->slug) }}">
                                     <img src="{{ asset('storage/' . $product->primary_image) }}" alt="{{ $product->name }}" class="w-full h-64 object-cover">
                                 </a>
+
+                                <!-- Sale Badge -->
+                                @if($product->hasDiscount())
+                                    <div class="absolute top-4 left-4">
+                                        <span class="bg-red-500 text-white px-3 py-1 rounded-full text-xs font-bold animate-pulse">
+                                            @if($product->is_on_sale)
+                                                SALE
+                                            @else
+                                                {{ number_format($product->getCalculatedDiscountPercentage(), 0) }}% OFF
+                                            @endif
+                                        </span>
+                                    </div>
+                                @endif
+
                                 @if($product->featured)
                                     <div class="absolute top-4 right-4">
                                         <span class="bg-yellow-500 text-white px-2 py-1 rounded-full text-xs font-medium flex items-center">

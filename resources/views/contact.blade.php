@@ -476,10 +476,16 @@
                 form.reset(); // Clear the form
                 clearFormErrors(form);
 
+                // Show success alert
+                alert('✅ Success!\n\n' + data.message);
+
                 // Scroll to success message
                 messageDiv.scrollIntoView({ behavior: 'smooth', block: 'center' });
             } else {
                 showMessage(messageDiv, data.message || 'An error occurred. Please try again.', 'error');
+
+                // Show error alert
+                alert('❌ Error!\n\n' + (data.message || 'An error occurred. Please try again.'));
             }
         })
         .catch(error => {
@@ -494,8 +500,14 @@
                     }
                 });
                 showMessage(messageDiv, 'Please correct the errors below.', 'error');
+
+                // Show validation error alert
+                alert('❌ Validation Error!\n\nPlease correct the errors in the form and try again.');
             } else {
                 showMessage(messageDiv, error.message || 'An error occurred. Please try again.', 'error');
+
+                // Show general error alert
+                alert('❌ Error!\n\n' + (error.message || 'An error occurred. Please try again.'));
             }
         })
         .finally(() => {

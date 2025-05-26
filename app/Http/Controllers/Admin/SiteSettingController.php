@@ -6,7 +6,8 @@ use App\Http\Controllers\Controller;
 use App\Models\SiteSetting;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
-use Intervention\Image\Facades\Image;
+use Intervention\Image\ImageManager;
+use Intervention\Image\Drivers\Gd\Driver;
 
 class SiteSettingController extends Controller
 {
@@ -88,12 +89,10 @@ class SiteSettingController extends Controller
         // Resize if dimensions provided
         if ($dimensions) {
             $fullPath = storage_path('app/public/' . $path);
-            $image = Image::make($fullPath);
-            $image->resize($dimensions[0], $dimensions[1], function ($constraint) {
-                $constraint->aspectRatio();
-                $constraint->upsize();
-            });
-            $image->save();
+            $manager = new ImageManager(new Driver());
+            $image = $manager->read($fullPath);
+            $image->resize($dimensions[0], $dimensions[1]);
+            $image->save($fullPath);
         }
 
         SiteSetting::set($settingKey, $path, 'image');
@@ -116,7 +115,8 @@ class SiteSettingController extends Controller
 
         // Create different sizes for favicon
         $fullPath = storage_path('app/public/' . $path);
-        $image = Image::make($fullPath);
+        $manager = new ImageManager(new Driver());
+        $image = $manager->read($fullPath);
 
         // Create 32x32 favicon
         $faviconPath = 'settings/favicon.ico';
@@ -128,8 +128,8 @@ class SiteSettingController extends Controller
         $favicon16Path = 'settings/favicon-16x16.png';
         $favicon32Path = 'settings/favicon-32x32.png';
 
-        Image::make($fullPath)->resize(16, 16)->save(storage_path('app/public/' . $favicon16Path));
-        Image::make($fullPath)->resize(32, 32)->save(storage_path('app/public/' . $favicon32Path));
+        $manager->read($fullPath)->resize(16, 16)->save(storage_path('app/public/' . $favicon16Path));
+        $manager->read($fullPath)->resize(32, 32)->save(storage_path('app/public/' . $favicon32Path));
 
         SiteSetting::set('site_favicon', $faviconPath, 'image');
         SiteSetting::set('favicon_16', $favicon16Path, 'image');
@@ -142,4 +142,5 @@ class SiteSettingController extends Controller
 
         return $faviconPath;
     }
+
 }

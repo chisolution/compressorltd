@@ -49,4 +49,19 @@ class Blog extends Model
     {
         return $this->status === 'published' && $this->published_at <= now();
     }
+
+    public function comments()
+    {
+        return $this->hasMany(Comment::class);
+    }
+
+    public function approvedComments()
+    {
+        return $this->hasMany(Comment::class)->approved();
+    }
+
+    public function pendingComments()
+    {
+        return $this->hasMany(Comment::class)->pending();
+    }
 }

@@ -62,8 +62,13 @@ class ProductController extends Controller
 
         $products = $query->paginate(12);
 
-        // Get all categories for the sidebar
-        $categories = Category::withCount('products')->get();
+        // Get all categories for the sidebar with proper product counts
+        $categories = Category::withProductCounts()->get();
+
+        // Calculate product counts including subcategories
+        foreach ($categories as $category) {
+            $category->products_count = $category->getTotalProductsCount();
+        }
 
         return view('products.index', compact('products', 'categories'));
     }

@@ -172,6 +172,19 @@
                                         </span>
                                     </div>
 
+                                    <!-- Sale Badge -->
+                                    @if($product->hasDiscount())
+                                        <div class="absolute top-4 right-4">
+                                            <span class="bg-red-500 text-white px-3 py-1 rounded-full text-xs font-bold animate-pulse">
+                                                @if($product->is_on_sale)
+                                                    SALE
+                                                @else
+                                                    {{ number_format($product->getCalculatedDiscountPercentage(), 0) }}% OFF
+                                                @endif
+                                            </span>
+                                        </div>
+                                    @endif
+
                                     <!-- Hover Overlay -->
                                     <div class="absolute inset-0 bg-black bg-opacity-0 group-hover:bg-opacity-20 transition-all duration-300 flex items-center justify-center">
                                         <div class="transform translate-y-4 group-hover:translate-y-0 opacity-0 group-hover:opacity-100 transition-all duration-300">
