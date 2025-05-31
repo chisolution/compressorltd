@@ -61,7 +61,7 @@
                 <!-- Image -->
                 <div class="relative">
                     <div class="bg-gray-200 rounded-lg overflow-hidden shadow-lg">
-                        <img src="{{ asset('images/about/company-overview.jpg') }}" alt="About {{ $siteSettings['company_name'] ?? 'Our Company' }}"
+                        <img src="{{ asset('images/about/about-us.jpg') }}" alt="About {{ $siteSettings['company_name'] ?? 'Our Company' }}"
                              class="w-full h-96 object-cover">
                     </div>
                     <!-- Floating Card -->

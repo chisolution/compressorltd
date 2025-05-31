@@ -256,7 +256,7 @@
                     <a href="{{ route('about.index') }}" class="btn-primary">Learn More About Us</a>
                 </div>
                 <div class="relative">
-                    <img src="{{ asset('images/home/transformer.jpg') }}" alt="About Compressor Ltd" class="rounded-lg shadow-lg w-full">
+                    <img src="{{ asset('images/home/technicians.jpg') }}" alt="About Compressor Ltd" class="rounded-lg shadow-lg w-full">
                     <div class="absolute -bottom-6 -left-6 bg-primary-color text-white p-6 rounded-lg shadow-lg hidden md:block">
                         <div class="text-4xl font-bold">10+</div>
                         <div class="text-lg">Years of Experience</div>

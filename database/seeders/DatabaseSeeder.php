@@ -17,6 +17,7 @@ class DatabaseSeeder extends Seeder
             SiteSettingsSeeder::class,
             CategorySeeder::class,
             RealProductSeeder::class,
+            NewsHeadlineSeeder::class,
         ]);
     }
 }
