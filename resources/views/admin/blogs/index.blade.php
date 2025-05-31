@@ -121,17 +121,16 @@
                                 @endif
                             </td>
                             <td class="py-4 px-3 text-left align-top">
-                                @if($blog->featured)
-                                    <span class="inline-flex items-center px-2 py-1 bg-purple-100 text-purple-800 rounded-full text-xs font-medium">
-                                        <i class="fas fa-star mr-1"></i>
-                                        Featured
+                                <button type="button"
+                                        class="featured-toggle-blog"
+                                        data-blog-id="{{ $blog->id }}"
+                                        data-featured="{{ $blog->featured ? 'true' : 'false' }}"
+                                        data-url="{{ route('admin.blogs.toggle-featured', $blog) }}">
+                                    <span class="featured-badge px-2 py-1 inline-flex text-xs leading-5 font-semibold rounded-full transition-all duration-200 {{ $blog->featured ? 'bg-yellow-100 text-yellow-800' : 'bg-gray-100 text-gray-600 hover:bg-yellow-100 hover:text-yellow-800' }}">
+                                        <i class="featured-icon {{ $blog->featured ? 'fas fa-star' : 'far fa-star' }} mr-1"></i>
+                                        <span class="featured-text">{{ $blog->featured ? 'Featured' : 'Not Featured' }}</span>
                                     </span>
-                                @else
-                                    <span class="inline-flex items-center px-2 py-1 bg-gray-100 text-gray-600 rounded-full text-xs font-medium">
-                                        <i class="far fa-star mr-1"></i>
-                                        Regular
-                                    </span>
-                                @endif
+                                </button>
                             </td>
                             <td class="py-4 px-3 text-left align-top">
                                 <div class="text-sm text-gray-600">
@@ -295,3 +294,124 @@
         </div>
     </div>
 @endsection
+
+@push('scripts')
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        initFeaturedBlogToggles();
+    });
+
+    function initFeaturedBlogToggles() {
+        const toggleButtons = document.querySelectorAll('.featured-toggle-blog');
+        toggleButtons.forEach(button => {
+            button.addEventListener('click', function() {
+                handleFeaturedBlogToggle(this);
+            });
+        });
+    }
+
+    function handleFeaturedBlogToggle(button) {
+        const blogId = button.dataset.blogId;
+        const currentFeatured = button.dataset.featured === 'true';
+        const url = button.dataset.url;
+        const badge = button.querySelector('.featured-badge');
+        const icon = button.querySelector('.featured-icon');
+        const text = button.querySelector('.featured-text');
+
+        if (!badge || !icon || !text) {
+            console.error('Required elements not found for featured toggle');
+            showToast('Error: Unable to toggle featured status', 'error');
+            return;
+        }
+
+        button.disabled = true;
+        button.classList.add('updating');
+        button.style.opacity = '0.7';
+        button.style.cursor = 'not-allowed';
+
+        // Save original state for error fallback
+        const originalFeatured = currentFeatured;
+
+        icon.className = 'featured-icon fas fa-spinner fa-spin mr-1';
+        text.textContent = 'Updating...';
+
+        fetch(url, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]')?.getAttribute('content') ||
+                               document.querySelector('input[name="_token"]')?.value,
+                'X-Requested-With': 'XMLHttpRequest'
+            },
+            body: JSON.stringify({})
+        })
+        .then(response => {
+            if (!response.ok) {
+                return response.json().then(data => Promise.reject(data));
+            }
+            return response.json();
+        })
+        .then(data => {
+            if (data.success) {
+                const newFeatured = data.featured;
+                button.dataset.featured = newFeatured ? 'true' : 'false';
+                updateFeaturedBlogButton(button, newFeatured);
+                showToast(data.message, 'success');
+            } else {
+                throw new Error(data.message || 'Failed to update featured status');
+            }
+        })
+        .catch(error => {
+            console.error('Featured toggle error:', error);
+            // Always reset to original state on error
+            updateFeaturedBlogButton(button, originalFeatured);
+            const errorMessage = error.message || 'Failed to update featured status. Please try again.';
+            showToast(errorMessage, 'error');
+        })
+        .finally(() => {
+            button.disabled = false;
+            button.classList.remove('updating');
+            button.style.opacity = '1';
+            button.style.cursor = 'pointer';
+        });
+    }
+
+    function updateFeaturedBlogButton(button, featured) {
+        const badge = button.querySelector('.featured-badge');
+        const icon = button.querySelector('.featured-icon');
+        const text = button.querySelector('.featured-text');
+        if (!badge || !icon || !text) {
+            console.error('Required elements not found for button update');
+            return;
+        }
+        icon.classList.remove('fa-spinner', 'fa-spin');
+        if (featured) {
+            badge.className = 'featured-badge px-2 py-1 inline-flex text-xs leading-5 font-semibold rounded-full transition-all duration-200 bg-yellow-100 text-yellow-800';
+            icon.className = 'featured-icon fas fa-star mr-1';
+            text.textContent = 'Featured';
+        } else {
+            badge.className = 'featured-badge px-2 py-1 inline-flex text-xs leading-5 font-semibold rounded-full transition-all duration-200 bg-gray-100 text-gray-600 hover:bg-yellow-100 hover:text-yellow-800';
+            icon.className = 'featured-icon far fa-star mr-1';
+            text.textContent = 'Not Featured';
+        }
+        if (badge) {
+            badge.style.transform = 'scale(1.05)';
+            setTimeout(() => {
+                badge.style.transform = 'scale(1)';
+            }, 200);
+        }
+    }
+
+    function showToast(message, type = 'success') {
+        const existingToasts = document.querySelectorAll('.toast-notification');
+        existingToasts.forEach(toast => toast.remove());
+        const toast = document.createElement('div');
+        toast.className = `toast-notification fixed top-6 right-6 z-50 px-6 py-3 rounded-lg shadow-lg text-white font-semibold ${type === 'success' ? 'bg-green-500' : 'bg-red-500'}`;
+        toast.textContent = message;
+        document.body.appendChild(toast);
+        setTimeout(() => {
+            toast.remove();
+        }, 2500);
+    }
+</script>
+@endpush

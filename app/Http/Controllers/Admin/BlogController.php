@@ -161,4 +161,18 @@ class BlogController extends Controller
         return redirect()->route('admin.blogs.index')
             ->with('success', 'Blog post deleted successfully.');
     }
+
+    /**
+     * Toggle the featured status of a blog post (AJAX).
+     */
+    public function toggleFeatured(Blog $blog)
+    {
+        $blog->featured = !$blog->featured;
+        $blog->save();
+        return response()->json([
+            'success' => true,
+            'featured' => $blog->featured,
+            'message' => $blog->featured ? 'Blog post marked as featured.' : 'Blog post unfeatured.'
+        ]);
+    }
 }

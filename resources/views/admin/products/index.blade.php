@@ -197,10 +197,11 @@
         button.style.opacity = '0.7';
         button.style.cursor = 'not-allowed';
 
+        // Save original state for error fallback
+        const originalFeatured = currentFeatured;
+
         // Show loading state
-        const originalIconClass = icon.className;
-        const originalText = text.textContent;
-        icon.className = 'fas fa-spinner fa-spin mr-1';
+        icon.className = 'featured-icon fas fa-spinner fa-spin mr-1';
         text.textContent = 'Updating...';
 
         // Send AJAX request
@@ -237,12 +238,8 @@
         })
         .catch(error => {
             console.error('Featured toggle error:', error);
-
-            // Restore original state
-            icon.className = originalIconClass;
-            text.textContent = originalText;
-
-            // Show error message
+            // Always reset to original state on error
+            updateFeaturedButton(button, originalFeatured);
             const errorMessage = error.message || 'Failed to update featured status. Please try again.';
             showToast(errorMessage, 'error');
         })

@@ -98,6 +98,7 @@ Route::prefix('admin')->name('admin.')->middleware(['auth'])->group(function () 
 
     // Blogs
     Route::resource('blogs', BlogController::class);
+    Route::post('blogs/{blog}/toggle-featured', [BlogController::class, 'toggleFeatured'])->name('blogs.toggle-featured');
 
     // Comments
     Route::resource('comments', App\Http\Controllers\Admin\CommentController::class);
