@@ -200,29 +200,14 @@
                     <div class="mb-4">
                         <label for="whatsapp_number" class="block text-sm font-medium text-gray-700 mb-2">
                             WhatsApp Number
-                            <span class="text-xs text-gray-500">(Include country code, e.g., +27123456789)</span>
                         </label>
                         <input type="text" name="whatsapp_number" id="whatsapp_number"
                                value="{{ old('whatsapp_number', $settings['whatsapp_number']->value ?? '') }}"
-                               placeholder="+27123456789"
                                class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary-color focus:border-transparent">
+                        <p class="text-xs text-gray-500 mt-1">Include country code (e.g., +27)</p>
                         @error('whatsapp_number')
                             <p class="text-red-500 text-xs mt-1">{{ $message }}</p>
                         @enderror
-                        <p class="text-xs text-gray-500 mt-1">This number will be used for the floating WhatsApp button on your website.</p>
-                    </div>
-
-                    <!-- WhatsApp Enabled -->
-                    <div class="mb-4">
-                        <div class="flex items-center">
-                            <input type="checkbox" name="whatsapp_enabled" id="whatsapp_enabled" value="1"
-                                   {{ old('whatsapp_enabled', $settings['whatsapp_enabled']->value ?? true) ? 'checked' : '' }}
-                                   class="h-4 w-4 text-primary-color focus:ring-primary-color border-gray-300 rounded">
-                            <label for="whatsapp_enabled" class="ml-2 block text-sm text-gray-700">
-                                Enable floating WhatsApp button
-                            </label>
-                        </div>
-                        <p class="text-xs text-gray-500 mt-1">Show a floating WhatsApp button on all pages for easy customer contact.</p>
                     </div>
                 </div>
 
@@ -239,6 +224,44 @@
                                   class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary-color focus:border-transparent"
                                   placeholder="Brief description about your company for homepage and about page">{{ old('about_us_content', $settings['about_us_content']->value ?? '') }}</textarea>
                         @error('about_us_content')
+                            <p class="text-red-500 text-xs mt-1">{{ $message }}</p>
+                        @enderror
+                    </div>
+                </div>
+
+                <!-- Notification Settings -->
+                <div class="bg-gray-50 p-4 rounded-lg">
+                    <h3 class="text-lg font-semibold text-gray-800 mb-4">
+                        <i class="fas fa-envelope mr-2 text-yellow-500"></i>
+                        Form Notification Settings
+                    </h3>
+
+                    <!-- Contact Form Notification Emails -->
+                    <div class="mb-4">
+                        <label for="contact_form_emails" class="block text-sm font-medium text-gray-700 mb-2">
+                            Contact Form Notification Emails
+                        </label>
+                        <input type="text" name="contact_form_emails" id="contact_form_emails"
+                               value="{{ old('contact_form_emails', $settings['contact_form_emails']->value ?? '') }}"
+                               class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary-color focus:border-transparent"
+                               placeholder="email1@example.com, email2@example.com">
+                        <p class="text-xs text-gray-500 mt-1">Separate multiple email addresses with commas</p>
+                        @error('contact_form_emails')
+                            <p class="text-red-500 text-xs mt-1">{{ $message }}</p>
+                        @enderror
+                    </div>
+
+                    <!-- Quote Request Notification Emails -->
+                    <div class="mb-4">
+                        <label for="quote_request_emails" class="block text-sm font-medium text-gray-700 mb-2">
+                            Quote Request Notification Emails
+                        </label>
+                        <input type="text" name="quote_request_emails" id="quote_request_emails"
+                               value="{{ old('quote_request_emails', $settings['quote_request_emails']->value ?? '') }}"
+                               class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary-color focus:border-transparent"
+                               placeholder="email1@example.com, email2@example.com">
+                        <p class="text-xs text-gray-500 mt-1">Separate multiple email addresses with commas</p>
+                        @error('quote_request_emails')
                             <p class="text-red-500 text-xs mt-1">{{ $message }}</p>
                         @enderror
                     </div>

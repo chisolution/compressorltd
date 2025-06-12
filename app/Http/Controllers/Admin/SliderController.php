@@ -4,11 +4,19 @@ namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
 use App\Models\Slider;
+use App\Services\ImageService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
 
 class SliderController extends Controller
 {
+    private $imageService;
+
+    public function __construct(ImageService $imageService)
+    {
+        $this->imageService = $imageService;
+    }
+
     /**
      * Display a listing of the resource.
      */
@@ -46,7 +54,7 @@ class SliderController extends Controller
 
         // Handle image upload
         if ($request->hasFile('image')) {
-            $data['image'] = $request->file('image')->store('sliders', 'public');
+            $data['image'] = $this->imageService->uploadImage($request->file('image'), 'sliders');
         }
 
         Slider::create($data);
@@ -96,7 +104,7 @@ class SliderController extends Controller
                 Storage::disk('public')->delete($slider->image);
             }
 
-            $data['image'] = $request->file('image')->store('sliders', 'public');
+            $data['image'] = $this->imageService->uploadImage($request->file('image'), 'sliders');
         }
 
         $slider->update($data);
@@ -138,5 +146,21 @@ class SliderController extends Controller
         }
 
         return response()->json(['success' => true]);
+    }
+
+    /**
+     * Remove the image from the slider.
+     */
+    public function removeImage(Slider $slider)
+    {
+        // Delete the image file
+        if ($slider->image) {
+            Storage::disk('public')->delete($slider->image);
+        }
+
+        // Update the database record
+        $slider->update(['image' => null]);
+
+        return back()->with('success', 'Slider image removed successfully.');
     }
 }

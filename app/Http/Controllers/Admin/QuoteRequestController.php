@@ -5,7 +5,10 @@ namespace App\Http\Controllers\Admin;
 use App\Http\Controllers\Controller;
 use App\Models\Product;
 use App\Models\QuoteRequest;
+use App\Models\SiteSetting;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Mail;
+use App\Mail\QuoteRequestNotification;
 
 class QuoteRequestController extends Controller
 {
@@ -43,6 +46,11 @@ class QuoteRequestController extends Controller
         ]);
 
         QuoteRequest::create($request->all());
+
+        $emails = SiteSetting::getEmailAddresses('quote_request_emails');
+        foreach ($emails as $email) {
+            Mail::to($email)->send(new QuoteRequestNotification($request->all()));
+        }
 
         return redirect()->route('admin.quote-requests.index')
             ->with('success', 'Quote request created successfully.');

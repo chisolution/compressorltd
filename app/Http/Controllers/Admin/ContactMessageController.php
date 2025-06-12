@@ -4,7 +4,12 @@ namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
 use App\Models\ContactMessage;
+use App\Mail\ContactReply;
+use App\Mail\ContactNotification;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Mail;
+use Illuminate\Support\Facades\Log;
+use App\Models\SiteSetting;
 
 class ContactMessageController extends Controller
 {
@@ -66,10 +71,21 @@ class ContactMessageController extends Controller
 
         $contactMessage->update($request->only('status'));
 
-        // If replying to the message, send an email
+        // Send notification to admin email addresses
+        $emails = SiteSetting::getEmailAddresses('contact_form_emails');
+        foreach ($emails as $email) {
+            Mail::to($email)->send(new ContactNotification($contactMessage));
+        }
+
+        // If replying to the message, send an email to the customer
         if ($request->status === 'replied' && $request->has('reply')) {
-            // In a real application, you would send an email here
-            // Mail::to($contactMessage->email)->send(new ContactReply($contactMessage, $request->reply));
+            try {
+                Mail::to($contactMessage->email)->send(new ContactReply($contactMessage, $request->reply));
+            } catch (\Exception $e) {
+                Log::error('Failed to send contact reply email: ' . $e->getMessage());
+                return redirect()->back()
+                    ->with('error', 'Failed to send email. Please check your email configuration.');
+            }
         }
 
         return redirect()->route('admin.contact-messages.show', $contactMessage)

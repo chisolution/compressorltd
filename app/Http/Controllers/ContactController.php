@@ -6,6 +6,7 @@ use App\Models\Branch;
 use App\Models\ContactMessage;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Mail;
+use Illuminate\Support\Facades\Log;
 
 class ContactController extends Controller
 {
@@ -50,13 +51,15 @@ class ContactController extends Controller
             'user_agent' => $request->userAgent()
         ]);
 
-        // Send notification email (optional)
+        // Send notification to admin email addresses
         try {
-            // You can implement email notification here
-            // Mail::to(config('mail.admin_email'))->send(new ContactMessageReceived($contactMessage));
+            $emails = \App\Models\SiteSetting::getEmailAddresses('contact_form_emails');
+            foreach ($emails as $email) {
+                Mail::to($email)->send(new \App\Mail\ContactNotification($contactMessage));
+            }
         } catch (\Exception $e) {
-            // Log error but don't fail the request
-            \Log::error('Failed to send contact notification email: ' . $e->getMessage());
+            Log::error('Failed to send contact form notification: ' . $e->getMessage());
+            // Don't let email failures affect the user experience
         }
 
         // Return JSON response for AJAX requests

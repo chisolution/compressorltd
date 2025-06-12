@@ -4,6 +4,9 @@ namespace App\Http\Controllers;
 
 use App\Models\QuoteRequest;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Mail;
+use Illuminate\Support\Facades\Log;
+use App\Models\SiteSetting;
 
 class QuoteRequestController extends Controller
 {
@@ -23,7 +26,7 @@ class QuoteRequestController extends Controller
         ]);
 
         // Create the quote request with default status 'new'
-        QuoteRequest::create([
+        $quoteRequest = QuoteRequest::create([
             'product_id' => $request->product_id,
             'name' => $request->name,
             'email' => $request->email,
@@ -33,6 +36,17 @@ class QuoteRequestController extends Controller
             'quantity' => $request->quantity ?? 1,
             'status' => 'new',
         ]);
+
+        // Send notification emails
+        try {
+            $emails = SiteSetting::getEmailAddresses('quote_request_emails');
+            foreach ($emails as $email) {
+                Mail::to($email)->send(new \App\Mail\QuoteRequestNotification($quoteRequest->toArray()));
+            }
+        } catch (\Exception $e) {
+            Log::error('Failed to send quote request notification: ' . $e->getMessage());
+            // Don't let email failures affect the user experience
+        }
 
         // Return JSON response for AJAX requests
         if ($request->ajax()) {

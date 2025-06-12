@@ -8,9 +8,17 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
 use Intervention\Image\ImageManager;
 use Intervention\Image\Drivers\Gd\Driver;
+use App\Services\ImageService;
 
 class SiteSettingController extends Controller
 {
+    private $imageService;
+
+    public function __construct(ImageService $imageService)
+    {
+        $this->imageService = $imageService;
+    }
+
     /**
      * Display site settings form
      */
@@ -40,6 +48,8 @@ class SiteSettingController extends Controller
             'whatsapp_enabled' => 'boolean',
             'site_logo' => 'nullable|image|mimes:jpeg,png,jpg,gif,svg|max:2048',
             'site_favicon' => 'nullable|image|mimes:jpeg,png,jpg,gif,ico|max:1024',
+            'contact_form_emails' => 'nullable|string',
+            'quote_request_emails' => 'nullable|string',
         ]);
 
         // Handle text settings
@@ -65,7 +75,17 @@ class SiteSettingController extends Controller
 
         // Handle favicon upload
         if ($request->hasFile('site_favicon')) {
-            $this->handleFaviconUpload($request->file('site_favicon'));
+            $faviconPath = $this->imageService->uploadImage($request->file('site_favicon'), 'settings');
+            $faviconWebPPath = $this->imageService->convertToWebP($faviconPath);
+            SiteSetting::set('site_favicon', $faviconWebPPath, 'image');
+        }
+
+        // Handle email settings
+        if ($request->has('contact_form_emails')) {
+            SiteSetting::set('contact_form_emails', $request->input('contact_form_emails'), 'text');
+        }
+        if ($request->has('quote_request_emails')) {
+            SiteSetting::set('quote_request_emails', $request->input('quote_request_emails'), 'text');
         }
 
         return redirect()->route('admin.settings.index')
@@ -97,50 +117,6 @@ class SiteSettingController extends Controller
 
         SiteSetting::set($settingKey, $path, 'image');
         return $path;
-    }
-
-    /**
-     * Handle favicon upload and conversion
-     */
-    private function handleFaviconUpload($file)
-    {
-        // Delete old favicon if exists
-        $oldFavicon = SiteSetting::get('site_favicon');
-        if ($oldFavicon && Storage::disk('public')->exists($oldFavicon)) {
-            Storage::disk('public')->delete($oldFavicon);
-        }
-
-        // Store original file
-        $path = $file->store('settings', 'public');
-
-        // Create different sizes for favicon
-        $fullPath = storage_path('app/public/' . $path);
-        $manager = new ImageManager(new Driver());
-        $image = $manager->read($fullPath);
-
-        // Create 32x32 favicon
-        $faviconPath = 'settings/favicon.ico';
-        $faviconFullPath = storage_path('app/public/' . $faviconPath);
-
-        $image->resize(32, 32)->save($faviconFullPath);
-
-        // Also create PNG versions for modern browsers
-        $favicon16Path = 'settings/favicon-16x16.png';
-        $favicon32Path = 'settings/favicon-32x32.png';
-
-        $manager->read($fullPath)->resize(16, 16)->save(storage_path('app/public/' . $favicon16Path));
-        $manager->read($fullPath)->resize(32, 32)->save(storage_path('app/public/' . $favicon32Path));
-
-        SiteSetting::set('site_favicon', $faviconPath, 'image');
-        SiteSetting::set('favicon_16', $favicon16Path, 'image');
-        SiteSetting::set('favicon_32', $favicon32Path, 'image');
-
-        // Clean up original uploaded file if different from favicon
-        if ($path !== $faviconPath) {
-            Storage::disk('public')->delete($path);
-        }
-
-        return $faviconPath;
     }
 
 }

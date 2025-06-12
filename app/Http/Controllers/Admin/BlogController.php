@@ -5,12 +5,20 @@ namespace App\Http\Controllers\Admin;
 use App\Http\Controllers\Controller;
 use App\Models\Blog;
 use App\Models\BlogCategory;
+use App\Services\ImageService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
 
 class BlogController extends Controller
 {
+    private $imageService;
+
+    public function __construct(ImageService $imageService)
+    {
+        $this->imageService = $imageService;
+    }
+
     /**
      * Display a listing of the resource.
      */
@@ -77,7 +85,7 @@ class BlogController extends Controller
 
         // Handle featured image upload
         if ($request->hasFile('featured_image')) {
-            $data['featured_image'] = $request->file('featured_image')->store('blogs', 'public');
+            $data['featured_image'] = $this->imageService->uploadImage($request->file('featured_image'), 'blogs');
         }
 
         Blog::create($data);
@@ -137,7 +145,7 @@ class BlogController extends Controller
                 Storage::disk('public')->delete($blog->featured_image);
             }
 
-            $data['featured_image'] = $request->file('featured_image')->store('blogs', 'public');
+            $data['featured_image'] = $this->imageService->uploadImage($request->file('featured_image'), 'blogs');
         }
 
         $blog->update($data);
@@ -174,5 +182,21 @@ class BlogController extends Controller
             'featured' => $blog->featured,
             'message' => $blog->featured ? 'Blog post marked as featured.' : 'Blog post unfeatured.'
         ]);
+    }
+
+    /**
+     * Remove the featured image from the blog post.
+     */
+    public function removeImage(Blog $blog)
+    {
+        // Delete the image file
+        if ($blog->featured_image) {
+            Storage::disk('public')->delete($blog->featured_image);
+        }
+
+        // Update the database record
+        $blog->update(['featured_image' => null]);
+
+        return back()->with('success', 'Featured image removed successfully.');
     }
 }

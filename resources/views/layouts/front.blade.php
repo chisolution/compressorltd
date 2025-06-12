@@ -694,6 +694,31 @@
 
         <!-- Global JavaScript -->
         <script>
+            // Quote Modal Functionality - Define these outside DOMContentLoaded for global access
+            const quoteModal = document.getElementById('quote-modal');
+            const closeModal = document.getElementById('close-modal');
+
+            function closeQuoteModal() {
+                if (quoteModal) {
+                    quoteModal.classList.add('hidden');
+                    document.body.style.overflow = 'auto';
+
+                    // Clear any messages and form errors when closing
+                    const messageDiv = document.getElementById('global-quote-message');
+                    const form = document.getElementById('global-quote-form');
+                    if (messageDiv) messageDiv.className = 'hidden';
+                    if (form) clearGlobalQuoteFormErrors(form);
+                }
+            }
+
+            // Make openQuoteModal globally available
+            window.openQuoteModal = function() {
+                if (quoteModal) {
+                    quoteModal.classList.remove('hidden');
+                    document.body.style.overflow = 'hidden';
+                }
+            };
+
             document.addEventListener('DOMContentLoaded', function() {
                 // Mobile Menu Toggle
                 const mobileMenuToggle = document.getElementById('mobile-menu-toggle');
@@ -704,32 +729,6 @@
                         mobileMenu.classList.toggle('hidden');
                     });
                 }
-
-                // Quote Modal Functionality
-                const quoteModal = document.getElementById('quote-modal');
-                const closeModal = document.getElementById('close-modal');
-
-                // Close modal function
-                function closeQuoteModal() {
-                    if (quoteModal) {
-                        quoteModal.classList.add('hidden');
-                        document.body.style.overflow = 'auto';
-
-                        // Clear any messages and form errors when closing
-                        const messageDiv = document.getElementById('global-quote-message');
-                        const form = document.getElementById('global-quote-form');
-                        if (messageDiv) messageDiv.className = 'hidden';
-                        if (form) clearGlobalQuoteFormErrors(form);
-                    }
-                }
-
-                // Open modal function
-                window.openQuoteModal = function() {
-                    if (quoteModal) {
-                        quoteModal.classList.remove('hidden');
-                        document.body.style.overflow = 'hidden';
-                    }
-                };
 
                 // Close modal event listeners
                 if (closeModal) {

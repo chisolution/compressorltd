@@ -83,9 +83,18 @@
                 <label for="image" class="block text-sm font-medium text-gray-700 mb-2">Slider Image</label>
                 
                 @if($slider->image)
-                    <div class="mb-3">
+                    <div class="mb-3 relative group">
                         <img src="{{ asset('storage/' . $slider->image) }}" alt="{{ $slider->title }}" class="max-w-full h-auto max-h-64 rounded-lg border-2 border-gray-300">
                         <p class="text-sm text-gray-500 mt-1">Current slider image</p>
+                        
+                        <!-- Remove Image Button -->
+                        <form action="{{ route('admin.sliders.remove-image', $slider) }}" method="POST" class="absolute top-2 right-2" onsubmit="return confirm('Are you sure you want to remove this image?')">
+                            @csrf
+                            @method('DELETE')
+                            <button type="submit" class="bg-red-500 text-white rounded-full w-8 h-8 flex items-center justify-center hover:bg-red-600 transition-colors">
+                                <i class="fas fa-times"></i>
+                            </button>
+                        </form>
                     </div>
                 @endif
                 

@@ -132,6 +132,22 @@
                 <p class="text-gray-500 text-sm mt-1">Featured testimonials are displayed prominently on the testimonials page.</p>
             </div>
 
+            <div class="mb-6">
+                <label class="block text-sm font-medium text-gray-700 mb-2">Gallery Images (Optional)</label>
+                <div class="grid grid-cols-2 gap-4">
+                    @foreach($testimonial->images as $image)
+                        <div class="relative">
+                            <img src="{{ asset('storage/' . $image->path) }}" alt="Testimonial Image" class="w-full h-32 object-cover rounded-md">
+                            <button type="button" class="absolute top-2 right-2 bg-red-500 hover:bg-red-600 text-white rounded-full p-1 remove-image"
+                                    data-url="{{ route('testimonials.remove-image', ['testimonial' => $testimonial->id, 'image' => $image->id]) }}">
+                                &times;
+                            </button>
+                        </div>
+                    @endforeach
+                </div>
+                <p class="text-gray-500 text-sm mt-2">Upload additional images to showcase the testimonial (JPG, PNG, GIF - Max 2MB each)</p>
+            </div>
+
             <div class="flex justify-end space-x-4">
                 <a href="{{ route('admin.testimonials.show', $testimonial) }}" 
                    class="inline-block bg-gray-300 hover:bg-gray-400 text-gray-800 px-6 py-3 rounded-md font-medium shadow-md transition-all duration-200 hover:shadow-lg">
@@ -147,5 +163,25 @@
                 </button>
             </div>
         </form>
+
+        <script>
+            document.querySelectorAll('.remove-image').forEach(button => {
+                button.addEventListener('click', function() {
+                    const url = this.dataset.url;
+                    fetch(url, {
+                        method: 'DELETE',
+                        headers: {
+                            'X-CSRF-TOKEN': '{{ csrf_token() }}'
+                        }
+                    }).then(response => {
+                        if (response.ok) {
+                            this.closest('.gallery-item').remove();
+                        } else {
+                            alert('Failed to remove image.');
+                        }
+                    });
+                });
+            });
+        </script>
     </div>
 @endsection

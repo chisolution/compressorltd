@@ -6,12 +6,21 @@ use App\Http\Controllers\Controller;
 use App\Models\Category;
 use App\Models\Product;
 use App\Models\ProductImage;
+use App\Services\ImageService;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
 
 class ProductController extends Controller
 {
+    private $imageService;
+
+    public function __construct(ImageService $imageService)
+    {
+        $this->imageService = $imageService;
+    }
+
     /**
      * Display a listing of the resource.
      */
@@ -45,8 +54,8 @@ class ProductController extends Controller
             'sale_price' => 'nullable|numeric|min:0',
             'additional_information' => 'nullable|string',
             'specifications' => 'nullable|string',
-            'primary_image' => 'required|image|mimes:jpeg,png,jpg,gif|max:2048',
-            'gallery_images.*' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
+            'primary_image' => 'required|image|mimes:jpeg,png,jpg,gif,webp|max:2048',
+            'gallery_images.*' => 'nullable|image|mimes:jpeg,png,jpg,gif,webp|max:2048',
             'status' => 'required|in:active,inactive',
             'featured' => 'boolean',
         ]);
@@ -60,7 +69,7 @@ class ProductController extends Controller
 
         // Handle primary image upload
         if ($request->hasFile('primary_image')) {
-            $data['primary_image'] = $request->file('primary_image')->store('products', 'public');
+            $data['primary_image'] = $this->imageService->uploadImage($request->file('primary_image'), 'products');
         }
 
         // Create the product
@@ -68,14 +77,10 @@ class ProductController extends Controller
 
         // Handle gallery images
         if ($request->hasFile('gallery_images')) {
-            foreach ($request->file('gallery_images') as $image) {
-                $imagePath = $image->store('products/gallery', 'public');
+            foreach ($request->file('gallery_images') as $galleryImage) {
+                $galleryImagePath = $this->imageService->uploadImage($galleryImage, 'products/gallery');
 
-                ProductImage::create([
-                    'product_id' => $product->id,
-                    'image_path' => $imagePath,
-                    'sort_order' => 0,
-                ]);
+                ProductImage::create(['product_id' => $product->id, 'path' => $galleryImagePath]);
             }
         }
 
@@ -116,7 +121,7 @@ class ProductController extends Controller
             'additional_information' => 'nullable|string',
             'specifications' => 'nullable|string',
             'primary_image' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
-            'gallery_images.*' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
+            'gallery_images.*' => 'nullable|image|mimes:jpeg,png,jpg,gif,webp|max:2048',
             'status' => 'required|in:active,inactive',
             'featured' => 'boolean',
         ]);
@@ -138,14 +143,10 @@ class ProductController extends Controller
 
         // Handle gallery images
         if ($request->hasFile('gallery_images')) {
-            foreach ($request->file('gallery_images') as $image) {
-                $imagePath = $image->store('products/gallery', 'public');
+            foreach ($request->file('gallery_images') as $galleryImage) {
+                $galleryImagePath = $this->imageService->uploadImage($galleryImage, 'products/gallery');
 
-                ProductImage::create([
-                    'product_id' => $product->id,
-                    'image_path' => $imagePath,
-                    'sort_order' => $product->images->count(),
-                ]);
+                ProductImage::create(['product_id' => $product->id, 'path' => $galleryImagePath]);
             }
         }
 
@@ -222,7 +223,7 @@ class ProductController extends Controller
                 ->with('success', $message);
 
         } catch (\Exception $e) {
-            \Log::error('Failed to toggle product featured status: ' . $e->getMessage());
+            Log::error('Failed to toggle product featured status: ' . $e->getMessage());
 
             if (request()->ajax()) {
                 return response()->json([

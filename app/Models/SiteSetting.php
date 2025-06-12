@@ -13,7 +13,8 @@ class SiteSetting extends Model
         'key',
         'value',
         'type',
-        'description'
+        'description',
+        'email_addresses'
     ];
 
     protected $casts = [
@@ -86,5 +87,14 @@ class SiteSetting extends Model
         }
 
         return $result;
+    }
+
+    /**
+     * Get email addresses for a given key
+     */
+    public static function getEmailAddresses($key)
+    {
+        $setting = static::where('key', $key)->first();
+        return $setting ? explode(',', $setting->value) : [];
     }
 }

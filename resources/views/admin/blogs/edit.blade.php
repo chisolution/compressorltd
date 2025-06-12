@@ -102,9 +102,18 @@
                 <label for="featured_image" class="block text-sm font-medium text-gray-700 mb-2">Featured Image</label>
                 
                 @if($blog->featured_image)
-                    <div class="mb-3">
+                    <div class="mb-3 relative group">
                         <img src="{{ asset('storage/' . $blog->featured_image) }}" alt="{{ $blog->title }}" class="w-48 h-auto rounded-md border-2 border-gray-300">
                         <p class="text-sm text-gray-500 mt-1">Current featured image</p>
+                        
+                        <!-- Remove Image Button -->
+                        <form action="{{ route('admin.blogs.remove-image', $blog) }}" method="POST" class="absolute top-2 right-2" onsubmit="return confirm('Are you sure you want to remove this image?')">
+                            @csrf
+                            @method('DELETE')
+                            <button type="submit" class="bg-red-500 text-white rounded-full w-8 h-8 flex items-center justify-center hover:bg-red-600 transition-colors">
+                                <i class="fas fa-times"></i>
+                            </button>
+                        </form>
                     </div>
                 @endif
                 
@@ -122,6 +131,38 @@
                 </div>
                 <p class="text-gray-500 text-sm mt-2">Leave empty to keep the current image.</p>
                 @error('featured_image')
+                    <p class="text-red-500 text-sm mt-1">{{ $message }}</p>
+                @enderror
+            </div>
+            
+            <!-- Gallery Section -->
+            <div class="mb-6">
+                <label class="block text-sm font-medium text-gray-700 mb-2">Image Gallery</label>
+                
+                <div class="gallery grid grid-cols-2 sm:grid-cols-3 gap-4">
+                    @foreach($blog->images as $image)
+                        <div class="gallery-item relative">
+                            <img src="{{ asset('storage/' . $image->path) }}" alt="Blog Image" class="w-full h-auto rounded-md border-2 border-gray-300">
+                            <button class="remove-image absolute top-2 right-2 bg-red-500 text-white rounded-full w-8 h-8 flex items-center justify-center hover:bg-red-600 transition-colors" data-url="{{ route('blogs.remove-image', ['blog' => $blog->id, 'image' => $image->id]) }}">&times;</button>
+                        </div>
+                    @endforeach
+                </div>
+                
+                <div class="flex items-center justify-center w-full mt-4">
+                    <label for="gallery_images" class="flex flex-col items-center justify-center w-full h-32 border-2 border-gray-300 border-dashed rounded-lg cursor-pointer bg-gray-50 hover:bg-gray-100">
+                        <div class="flex flex-col items-center justify-center pt-5 pb-6">
+                            <svg class="w-8 h-8 mb-3 text-gray-500" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 20 16">
+                                <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 13h3a3 3 0 0 0 0-6h-.025A5.56 5.56 0 0 0 16 6.5 5.5 5.5 0 0 0 5.207 5.021C5.137 5.017 5.071 5 5 5a4 4 0 0 0 0 8h2.167M10 15V6m0 0L8 8m2-2 2 2"/>
+                            </svg>
+                            <p class="mb-1 text-sm text-gray-500"><span class="font-semibold">Click to upload</span> or drag and drop</p>
+                            <p class="text-xs text-gray-500">PNG, JPG or GIF (MAX. 2MB)</p>
+                        </div>
+                        <input id="gallery_images" name="gallery_images[]" type="file" class="hidden" accept="image/*" multiple />
+                    </label>
+                </div>
+                
+                <p class="text-gray-500 text-sm mt-2">Leave empty to keep the current images.</p>
+                @error('gallery_images')
                     <p class="text-red-500 text-sm mt-1">{{ $message }}</p>
                 @enderror
             </div>
@@ -193,6 +234,25 @@
             flatpickr("#published_at", {
                 enableTime: true,
                 dateFormat: "Y-m-d H:i",
+            });
+            
+            // Remove image from gallery
+            document.querySelectorAll('.remove-image').forEach(button => {
+                button.addEventListener('click', function() {
+                    const url = this.dataset.url;
+                    fetch(url, {
+                        method: 'DELETE',
+                        headers: {
+                            'X-CSRF-TOKEN': '{{ csrf_token() }}'
+                        }
+                    }).then(response => {
+                        if (response.ok) {
+                            this.closest('.gallery-item').remove();
+                        } else {
+                            alert('Failed to remove image.');
+                        }
+                    });
+                });
             });
         });
     </script>

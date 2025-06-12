@@ -4,11 +4,19 @@ namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
 use App\Models\Testimonial;
+use App\Services\ImageService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
 
 class TestimonialController extends Controller
 {
+    private $imageService;
+
+    public function __construct(ImageService $imageService)
+    {
+        $this->imageService = $imageService;
+    }
+
     /**
      * Display a listing of the resource.
      */
@@ -66,7 +74,7 @@ class TestimonialController extends Controller
 
         // Handle image upload
         if ($request->hasFile('image')) {
-            $data['image'] = $request->file('image')->store('testimonials', 'public');
+            $data['image'] = $this->imageService->uploadImage($request->file('image'), 'testimonials');
         }
 
         Testimonial::create($data);
@@ -117,7 +125,7 @@ class TestimonialController extends Controller
             if ($testimonial->image) {
                 Storage::disk('public')->delete($testimonial->image);
             }
-            $data['image'] = $request->file('image')->store('testimonials', 'public');
+            $data['image'] = $this->imageService->uploadImage($request->file('image'), 'testimonials');
         }
 
         $testimonial->update($data);
@@ -174,5 +182,21 @@ class TestimonialController extends Controller
         $status = $testimonial->featured ? 'featured' : 'unfeatured';
         return redirect()->back()
             ->with('success', "Testimonial {$status} successfully.");
+    }
+
+    /**
+     * Remove the image from the testimonial.
+     */
+    public function removeImage(Testimonial $testimonial)
+    {
+        // Delete the image file
+        if ($testimonial->image) {
+            Storage::disk('public')->delete($testimonial->image);
+        }
+
+        // Update the database record
+        $testimonial->update(['image' => null]);
+
+        return back()->with('success', 'Image removed successfully.');
     }
 }

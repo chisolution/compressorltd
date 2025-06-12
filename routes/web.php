@@ -99,6 +99,7 @@ Route::prefix('admin')->name('admin.')->middleware(['auth'])->group(function () 
     // Blogs
     Route::resource('blogs', BlogController::class);
     Route::post('blogs/{blog}/toggle-featured', [BlogController::class, 'toggleFeatured'])->name('blogs.toggle-featured');
+    Route::delete('blogs/{blog}/remove-image', [BlogController::class, 'removeImage'])->name('blogs.remove-image');
 
     // Comments
     Route::resource('comments', App\Http\Controllers\Admin\CommentController::class);
@@ -108,6 +109,7 @@ Route::prefix('admin')->name('admin.')->middleware(['auth'])->group(function () 
     // Sliders
     Route::resource('sliders', SliderController::class);
     Route::post('sliders/update-order', [SliderController::class, 'updateOrder'])->name('sliders.update-order');
+    Route::delete('sliders/{slider}/remove-image', [SliderController::class, 'removeImage'])->name('sliders.remove-image');
 
     // Site Settings Management
     Route::get('settings', [App\Http\Controllers\Admin\SiteSettingController::class, 'index'])->name('settings.index');
