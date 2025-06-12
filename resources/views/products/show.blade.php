@@ -287,11 +287,12 @@
                 </div>
             </div>
 
+            <!-- Quantity Field -->
             <div>
-                <label for="quantity" class="block text-sm font-medium text-gray-700 mb-2">Quantity</label>
-                <input type="number" name="quantity" id="quantity" min="1" value="1"
+                <label for="quantity" class="block text-sm font-medium text-gray-700 mb-2">Quantity *</label>
+                <input type="number" name="quantity" id="quantity" value="1" min="1"
                        class="w-full border-2 border-gray-300 rounded-lg shadow-sm py-3 px-4 bg-white focus:border-primary-color focus:ring focus:ring-primary-color focus:ring-opacity-50 transition-all"
-                       placeholder="Enter quantity needed">
+                       placeholder="Enter quantity">
             </div>
 
             <div>

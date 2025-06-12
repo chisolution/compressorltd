@@ -34,6 +34,9 @@
             <div class="info-row">
                 <span class="info-label">Product:</span> {{ $product ? $product->name : 'Product not found' }}
             </div>
+            <div class="info-row">
+                <span class="info-label">Quantity:</span> {{ $quoteRequest['quantity'] ?? 1 }}
+            </div>
             @if($product && $product->primary_image)
             <div style="margin-top: 15px;">
                 <img src="{{ asset('storage/' . $product->primary_image) }}" 

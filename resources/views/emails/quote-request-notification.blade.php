@@ -22,6 +22,9 @@ use App\Services\CompanyInfoService;
 - **Company:** {{ $quoteRequest['company'] ?? 'Not specified' }}
 
 ## Quote Details
+@if(isset($quoteRequest['product_interest']) && is_array($quoteRequest['product_interest']))
+- **Product Interest:** {{ implode(', ', $quoteRequest['product_interest']) }}
+@endif
 @if(isset($quoteRequest['product_id']) && $quoteRequest['product_id'])
 @php
     $product = \App\Models\Product::find($quoteRequest['product_id']);
